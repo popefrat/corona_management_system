@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import './style.css'
 import {GetAllPersons,GetAllCoronaVaccines} from './Server'
 import moment from 'moment';
+import Avatar from '@mui/material/Avatar';
     export default function AllMembers()
     {
         const [allpersons,setAllPersons] = useState([]);
         const[vaccinations,setAllVaccinations] = useState([]);
+        const [imageUrl,setImageUrl] = useState("/broken-image.jpg");
         useEffect(() => {
             const getData = async () => {
               const result = await GetAllPersons();
@@ -20,6 +22,27 @@ import moment from 'moment';
             }
             getDatavaccinations();
           },[vaccinations]);
+
+          useEffect(() => {
+            const fetchImage = async (person) => {
+              try {
+                const response = await fetch(`http://localhost:8080/person/${person.id}/image`);
+                if (response.ok) {
+                  const imageBlob = await response.blob();
+                  const url = URL.createObjectURL(imageBlob);
+                  setImageUrl((prevImageUrls) => ({ ...prevImageUrls, [person.id]: url }));
+                }
+              } catch (error) {
+                console.error('Error fetching person image:', error);
+              }
+            };
+            allpersons.forEach((person) => {
+              if (person.image) {
+                fetchImage(person);
+              }
+            });
+          }, [allpersons]);
+        
     
           return (
             <table className="all-persons-table">
@@ -41,9 +64,10 @@ import moment from 'moment';
               <tbody >
                 {allpersons.map(person => {
                   const personVaccinations = vaccinations.find(v => v.PersonId === person.id);
+                  const imageUrls = imageUrl[person.id];
                   return (
                     <tr key={person.id}>
-                      <td><img src={person.image}/></td>
+                      <td><Avatar src={imageUrls} style={{ marginLeft: '20px',marginTop:"20px" }}/></td>
                       <td>{person.name}</td>
                       <td>{`${person.Address.city}, ${person.Address.street} ${person.Address.number}`}</td>
                       <td>{person.identityCard}</td>

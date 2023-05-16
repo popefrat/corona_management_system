@@ -3,13 +3,16 @@ import { useLocation } from 'react-router';
 import './style.css';
 import moment from 'moment';
 import axios from 'axios';
+import Avatar from '@mui/material/Avatar';
 
 function User() {
+  
     const [CoronaVaccinesById,setCoronaVaccinesById] = useState()
     const {state} = useLocation();
     const {findPerson} = state;
     const [file, setFile] = useState('');
-  
+    const [imageUrl,setImageUrl] = useState("/broken-image.jpg");
+
   useEffect(()=>{
     const getData = async ()=>{
       const response =await axios.get(`http://localhost:8080/Corona/${findPerson.id}`)
@@ -17,7 +20,25 @@ function User() {
     }
     getData();
   },[])
+  useEffect(() => {
+    if(findPerson.image){
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/person/${findPerson.id}/image`); // הנתיב לשרת יכול להיות שונה בהתאם למיקום השרת שלך
+        console.log(response)
+        if (response.ok) {
+          const imageBlob = await response.blob();
+          const url = URL.createObjectURL(imageBlob);
+          setImageUrl(url);
+        }
+      } catch (error) {
+        console.error('Error fetching person image:', error);
+      }
+    };
+    fetchImage();}
+  }, []);
   const handleFileChange = (event) => {
+    setImageUrl(URL.createObjectURL(event.target.files[0]));
     setFile(event.target.files[0]);
   };
   const handleSubmit = (event) => {
@@ -38,27 +59,20 @@ function User() {
         console.error(error);
       });
   };
-    //  const base64String = (String.fromCharCode(...new Uint8Array(findPerson.image.data)))
+
   return (<>
-            {/* <img src={`http://localhost:8080${findPerson.image}`} alt="profil"/> */}
-            <img src = {findPerson.image} alt = "profil"/>
             <div className="user-profile">
             <div className="user-photo-container">
             <div className="personal-area-text">Personal Area</div>
-                {/* <img src={`http://localhost:8080/${findPerson?.image}`} alt={'profil'} className="user-photo" /> */}
-                {/* <img src={`http://localhost:8080/uploads`} alt={'profil'} className="user-photo" /> */}
-                {/* <img src={`data:${findPerson.image.contentType};base64,${base64String}`} alt={'profil'} className="user-photo" /> */}
-
             </div>
             </div>
             <table className="all-persons-table">
                 <thead>
-                  {/* <th>Profil</th> */}
+                  <th>Profil</th>
                   <th>Name</th>
                   <th>identityCard</th>
                   <th>DateOfBirth</th>
                   <th>Address</th>
-                  <th>DateofBirth</th>
                   <th>Phone</th>
                   <th>MobilePhone</th>
                   <th>Vaccinations</th>
@@ -68,11 +82,13 @@ function User() {
                 </thead>
                 <tbody>
                 <tr>
+                    <td>{imageUrl && (
+                        <Avatar src={imageUrl} style={{ marginLeft: '20px',marginTop:"20px" }} />
+                    )}</td>
                     <td>{findPerson.name}</td> 
                     <td>{findPerson.identityCard}</td>
                     <td>{moment(findPerson.DateOfBirth).format('DD/MM/YYYY')}</td>
-                    <td>{findPerson.Address.city}</td>
-                    <td>{findPerson.Address.street}{""}{findPerson.Address.number}</td>
+                    <td>{`${findPerson.Address.city},${findPerson.Address.street},${findPerson.Address.number}`}</td>
                     <td>{findPerson.Phone}</td>
                     <td>{findPerson.MobilePhone}</td>
                     {CoronaVaccinesById?(<>

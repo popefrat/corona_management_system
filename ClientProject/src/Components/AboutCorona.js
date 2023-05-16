@@ -91,7 +91,7 @@ export default function CoronaSummary()
       return<>
       <p>The number of members of the fund who are not vaccinated:{zeroLengthVaccinations}</p>
       <div>
-      <p>Total patients: {totalPatients}</p>
+      {/* <p>Total patients: {totalPatients}</p> */}
       <canvas ref={chartRef} width="400" height="150" />
     </div>
       </>

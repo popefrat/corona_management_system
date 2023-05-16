@@ -56,7 +56,6 @@ const PersonSchema = mongoose.Schema({
     },
     image:{
             name:String,
-            data: Buffer,
             contentType: String
     }
     

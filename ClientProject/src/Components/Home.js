@@ -1,10 +1,10 @@
-
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router'
 import './style.css'
 import { Link } from 'react-router-dom';
 import AllMembers from './Manager';
 import axios from 'axios';
+
 export default function Home()
 {
     const navigate = useNavigate();
@@ -41,18 +41,22 @@ export default function Home()
       
       const logIn = async () => {
         setIsModalOpen(false);
-        if (identity === '123' && name == 'admin') {
+        if (identity === '123' && name === 'admin') {
           setIsManager(true);
           setIsButton(false);
         } else {
           const data = await getUserData(identity);
           if (data == null) {
+            console.log(data)
             navigate('join');
-            setIsHome(false);
-          } else {
+            setIsHome(false);}
+           else{ 
+          if(data.name!=name)
+          alert('The name does not match, try again')
+          else{
             setIsButton(false);
             setIsUser(true);
-          }
+          }}
         }
       };
     return<>

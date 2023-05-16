@@ -10,13 +10,6 @@ import CoronaRouter from './routers/CoronaRouter.js';
 
 connectDB();
 const app = express();
-
-// const Storage = multer.diskStorage({
-//     destination:'uploads',
-//     filename:(req,file,cb)=>{
-//         cb(null,file.originalname);
-//     },
-// });
 app.use(cors())
 app.use(bodyParser.json());
 
